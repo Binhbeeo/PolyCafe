@@ -10,39 +10,49 @@
     response.setHeader("Pragma", "no-cache");
     response.setDateHeader("Expires", 0);
 %>
-<script>
-    // Chặn back button - đẩy state mới vào history
-    history.pushState(null, null, window.location.href);
-    window.addEventListener('popstate', function() {
-        history.pushState(null, null, window.location.href);
-    });
-</script>
-<nav style="background:#6f4e37;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:56px;position:sticky;top:0;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.25);width:100%;box-sizing:border-box;">
-    <div style="font-size:16px;font-weight:700;white-space:nowrap;flex-shrink:0;">☕ PolyCoffee</div>
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-        <span style="font-size:12px;white-space:nowrap;">👤 <%= currentUser != null ? currentUser.getFullName() : "" %></span>
-        <% if (isAdmin) { %>
-        <span style="font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;white-space:nowrap;background:#f6ad55;color:#7b341e;">Quản lý</span>
-        <% } else { %>
-        <span style="font-size:11px;padding:2px 8px;border-radius:12px;font-weight:600;white-space:nowrap;background:#90cdf4;color:#2c5282;">Nhân viên</span>
-        <% } %>
-        <a href="<%= ctx %>/logout" style="white-space:nowrap;padding:5px 12px;border-radius:6px;border:1.5px solid #fff;color:#fff;font-size:13px;text-decoration:none;">Đăng xuất</a>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
+</head>
+<body>
+<nav class="navbar">
+    <div class="navbar-brand">
+        <i class="bi bi-cup-hot"></i>
+        <span>PolyCoffee</span>
+    </div>
+    <div class="navbar-right">
+        <div class="navbar-user">
+            <i class="bi bi-person-circle"></i>
+            <span><%= currentUser != null ? currentUser.getFullName() : "Người dùng" %></span>
+            <% if (isAdmin) { %>
+            <span class="badge-role admin">Quản lý</span>
+            <% } else { %>
+            <span class="badge-role staff">Nhân viên</span>
+            <% } %>
+        </div>
+        <a href="<%= ctx %>/logout" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3);">
+            <i class="bi bi-box-arrow-right"></i> Đăng xuất
+        </a>
     </div>
 </nav>
+
 <div class="layout">
     <aside class="sidebar">
         <ul class="sidebar-menu">
             <% if (isAdmin) { %>
-            <li><a href="<%= ctx %>/admin/dashboard">📊 Tổng quan</a></li>
-            <li><a href="<%= ctx %>/admin/categories">🗂️ Danh mục</a></li>
-            <li><a href="<%= ctx %>/admin/drinks">🥤 Đồ uống</a></li>
-            <li><a href="<%= ctx %>/admin/bills">🧾 Hóa đơn</a></li>
-            <li><a href="<%= ctx %>/admin/users">👥 Nhân viên</a></li>
-            <li><a href="<%= ctx %>/admin/reports">📈 Báo cáo</a></li>
+            <li><a href="<%= ctx %>/admin/dashboard"><i class="bi bi-graph-up"></i> Tổng quan</a></li>
+            <li><a href="<%= ctx %>/admin/categories"><i class="bi bi-folder"></i> Danh mục</a></li>
+            <li><a href="<%= ctx %>/admin/drinks"><i class="bi bi-cup"></i> Đồ uống</a></li>
+            <li><a href="<%= ctx %>/admin/bills"><i class="bi bi-receipt"></i> Hóa đơn</a></li>
+            <li><a href="<%= ctx %>/admin/users"><i class="bi bi-people"></i> Nhân viên</a></li>
+            <li><a href="<%= ctx %>/admin/reports"><i class="bi bi-bar-chart"></i> Báo cáo</a></li>
             <% } else { %>
-            <li><a href="<%= ctx %>/staff/bills?action=new">➕ Tạo đơn</a></li>
-            <li><a href="<%= ctx %>/staff/bills">🧾 Đơn của tôi</a></li>
-            <li><a href="<%= ctx %>/staff/profile">👤 Tài khoản</a></li>
+            <li><a href="<%= ctx %>/staff/bills?action=new"><i class="bi bi-plus-circle"></i> Tạo đơn</a></li>
+            <li><a href="<%= ctx %>/staff/bills"><i class="bi bi-receipt"></i> Đơn của tôi</a></li>
+            <li><a href="<%= ctx %>/staff/profile"><i class="bi bi-person"></i> Tài khoản</a></li>
             <% } %>
         </ul>
     </aside>

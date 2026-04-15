@@ -8,6 +8,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PolyCoffee – Thực đơn</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/style.css">
 </head>
 <body class="public-page">
@@ -15,17 +16,24 @@
 <!-- Header -->
 <header class="public-header">
     <div class="public-header-inner">
-        <div class="brand">☕ <strong>PolyCoffee</strong></div>
+        <div class="brand">
+            <i class="bi bi-cup-hot"></i>
+            <strong>PolyCoffee</strong>
+        </div>
         <nav class="public-nav">
-            <a href="${pageContext.request.contextPath}/">Thực đơn</a>
-            <a href="${pageContext.request.contextPath}/login" class="btn btn-primary btn-sm">Đăng nhập</a>
+            <a href="${pageContext.request.contextPath}/">
+                <i class="bi bi-house"></i> Thực đơn
+            </a>
+            <a href="${pageContext.request.contextPath}/login" class="btn btn-sm" style="background: rgba(255,255,255,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.3);">
+                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
+            </a>
         </nav>
     </div>
 </header>
 
-<!-- Hero -->
+<!-- Hero Section -->
 <section class="hero">
-    <h1>Chào mừng đến với PolyCoffee</h1>
+    <h1><i class="bi bi-cup-hot"></i> Chào mừng đến với PolyCoffee</h1>
     <p>Khám phá menu đồ uống phong phú của chúng tôi</p>
 </section>
 
@@ -38,47 +46,71 @@
         int selectedCategory      = (request.getAttribute("selectedCategory") instanceof Integer) ? (Integer) request.getAttribute("selectedCategory") : 0;
         NumberFormat nf = NumberFormat.getInstance(new Locale("vi","VN"));
     %>
-    <div class="category-tabs">
-        <a href="${pageContext.request.contextPath}/"
-           class="tab-btn <%= selectedCategory == 0 ? "active" : "" %>">Tất cả</a>
-        <% if (categories != null) for (Category c : categories) { %>
-        <a href="${pageContext.request.contextPath}/?category=<%= c.getId() %>"
-           class="tab-btn <%= c.getId() == selectedCategory ? "active" : "" %>">
-            <%= c.getName() %>
-        </a>
-        <% } %>
+    
+    <div style="margin-bottom: 28px;">
+        <h3 style="margin-bottom: 16px; font-size: 18px; font-weight: 600; color: #2d3748;">
+            <i class="bi bi-filter"></i> Danh mục
+        </h3>
+        <div class="category-tabs">
+            <a href="${pageContext.request.contextPath}/"
+               class="tab-btn <%= selectedCategory == 0 ? "active" : "" %>">
+                <i class="bi bi-collection"></i> Tất cả
+            </a>
+            <% if (categories != null) for (Category c : categories) { %>
+            <a href="${pageContext.request.contextPath}/?category=<%= c.getId() %>"
+               class="tab-btn <%= c.getId() == selectedCategory ? "active" : "" %>">
+                <%= c.getName() %>
+            </a>
+            <% } %>
+        </div>
     </div>
 
     <!-- Lưới đồ uống -->
-    <div class="menu-grid">
-        <% if (drinks != null && !drinks.isEmpty()) {
-               for (Drink d : drinks) { %>
-        <div class="menu-card">
-            <div class="menu-card-img">
-                <% if (d.getImage() != null && !d.getImage().isEmpty()) { %>
-                <img src="<%= d.getImage() %>" alt="<%= d.getName() %>">
-                <% } else { %>
-                <div class="menu-no-img">☕</div>
-                <% } %>
+    <div style="margin-bottom: 28px;">
+        <h3 style="margin-bottom: 20px; font-size: 18px; font-weight: 600; color: #2d3748;">
+            <i class="bi bi-cup"></i> Menu đồ uống
+        </h3>
+        <% if (drinks != null && !drinks.isEmpty()) { %>
+        <div class="menu-grid">
+            <% for (Drink d : drinks) { %>
+            <div class="menu-card fade-in">
+                <div class="menu-card-img">
+                    <% if (d.getImage() != null && !d.getImage().isEmpty()) { %>
+                    <img src="<%= d.getImage() %>" alt="<%= d.getName() %>" loading="lazy">
+                    <% } else { %>
+                    <div class="menu-no-img"><i class="bi bi-cup"></i></div>
+                    <% } %>
+                </div>
+                <div class="menu-card-body">
+                    <div class="menu-category">
+                        <i class="bi bi-tag"></i> <%= d.getCategoryName() != null ? d.getCategoryName() : "Khác" %>
+                    </div>
+                    <h3 class="menu-name"><%= d.getName() %></h3>
+                    <% if (d.getDescription() != null && !d.getDescription().isEmpty()) { %>
+                    <p class="menu-desc"><%= d.getDescription() %></p>
+                    <% } %>
+                    <div class="menu-price">
+                        <i class="bi bi-currency-dollar"></i> <%= nf.format(d.getPrice()) %>đ
+                    </div>
+                </div>
             </div>
-            <div class="menu-card-body">
-                <div class="menu-category"><%= d.getCategoryName() != null ? d.getCategoryName() : "" %></div>
-                <h3 class="menu-name"><%= d.getName() %></h3>
-                <% if (d.getDescription() != null && !d.getDescription().isEmpty()) { %>
-                <p class="menu-desc"><%= d.getDescription() %></p>
-                <% } %>
-                <div class="menu-price"><%= nf.format(d.getPrice()) %>đ</div>
-            </div>
+            <% } %>
         </div>
-        <% }
-           } else { %>
-        <div class="empty-state" style="grid-column:1/-1">Không có đồ uống nào.</div>
+        <% } else { %>
+        <div class="empty-state">
+            <i class="bi bi-inbox" style="font-size: 48px; color: #ccc; display: block; margin-bottom: 12px;"></i>
+            <p>Không có đồ uống nào.</p>
+        </div>
         <% } %>
     </div>
 </div>
 
 <footer class="public-footer">
-    <p>© 2024 PolyCoffee – FPT Polytechnic</p>
+    <p>
+        <i class="bi bi-c-circle"></i> 2024 PolyCoffee – FPT Polytechnic
+    </p>
 </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

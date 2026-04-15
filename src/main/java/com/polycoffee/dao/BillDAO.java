@@ -299,6 +299,37 @@ public class BillDAO {
         return result;
     }
 
+    /** Top sản phẩm bán chạy trong khoảng thời gian */
+    public List<Map<String, Object>> topDrinksByDateRange(int limit, Date from, Date to) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        String sql = "SELECT TOP (?) d.name, c.name AS category_name, SUM(bd.quantity) AS total_sold, " +
+                     "SUM(bd.quantity * bd.price) AS total_revenue " +
+                     "FROM bill_details bd " +
+                     "JOIN drinks d ON bd.drink_id = d.id " +
+                     "JOIN categories c ON d.category_id = c.id " +
+                     "JOIN bills b ON bd.bill_id = b.id " +
+                     "WHERE b.status = 'finish' AND b.created_at >= ? AND b.created_at < DATEADD(day, 1, ?) " +
+                     "GROUP BY d.name, c.name ORDER BY total_sold DESC";
+        Connection con = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            con = JdbcUtil.getConnection(); ps = con.prepareStatement(sql);
+            ps.setInt(1, limit);
+            ps.setDate(2, new java.sql.Date(from.getTime()));
+            ps.setDate(3, new java.sql.Date(to.getTime()));
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                Map<String, Object> row = new LinkedHashMap<>();
+                row.put("name",          rs.getString("name"));
+                row.put("categoryName",  rs.getString("category_name"));
+                row.put("totalSold",     rs.getInt("total_sold"));
+                row.put("totalRevenue",  rs.getDouble("total_revenue"));
+                result.add(row);
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        finally { JdbcUtil.close(rs, ps, con); }
+        return result;
+    }
+
     // ====================================================
     //  Helpers
     // ====================================================

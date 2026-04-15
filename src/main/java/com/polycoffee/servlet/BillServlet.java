@@ -36,6 +36,11 @@ public class BillServlet extends HttpServlet {
             case "detail":
                 Bill bill = billDAO.findById(id);
                 if (bill == null) { resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills")); return; }
+                // Kiểm tra quyền: staff chỉ xem được hóa đơn của chính mình
+                if (!isAdmin && bill.getUserId() != current.getId()) {
+                    resp.sendRedirect(req.getContextPath() + "/staff/bills");
+                    return;
+                }
                 req.setAttribute("bill", bill);
                 req.getRequestDispatcher("/views/" + (isAdmin ? "admin" : "staff") + "/bill-detail.jsp").forward(req, resp);
                 break;
@@ -126,7 +131,8 @@ public class BillServlet extends HttpServlet {
             int drinkId = ParamUtil.getInt(req, "drinkId");
             int qty     = ParamUtil.getInt(req, "quantity");
             billDAO.updateDetailQuantity(billId, drinkId, qty);
-            resp.sendRedirect(req.getContextPath() + "/staff/bills?action=detail&id=" + billId);
+            boolean isAdmin = AuthUtil.isManager(req);
+            resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?action=detail&id=" + billId);
         }
     }
 }

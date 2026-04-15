@@ -73,7 +73,7 @@ public class DashboardServlet extends HttpServlet {
         }
 
         req.setAttribute("revenueByDay", billDAO.revenueByDay(from, to));
-        req.setAttribute("topDrinks",    billDAO.topDrinks(10));
+        req.setAttribute("topDrinks",    billDAO.topDrinksByDateRange(10, from, to));
         req.setAttribute("from",         sdf.format(from));
         req.setAttribute("to",           sdf.format(to));
 
