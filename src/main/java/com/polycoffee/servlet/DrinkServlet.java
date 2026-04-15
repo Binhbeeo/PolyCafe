@@ -3,17 +3,14 @@ package com.polycoffee.servlet;
 import com.polycoffee.dao.CategoryDAO;
 import com.polycoffee.dao.DrinkDAO;
 import com.polycoffee.entity.Drink;
-import com.polycoffee.util.FileUtil;
 import com.polycoffee.util.ParamUtil;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/admin/drinks")
-@MultipartConfig(maxFileSize = 10 * 1024 * 1024) // 10MB (Base64 lưu DB)
 public class DrinkServlet extends HttpServlet {
 
     private final DrinkDAO    drinkDAO    = new DrinkDAO();
@@ -87,8 +84,9 @@ public class DrinkServlet extends HttpServlet {
             return;
         }
 
-        // Xử lý upload ảnh
-        String newImage = FileUtil.upload(req, "image");
+        // Lấy URL ảnh từ input
+        String imageUrl = ParamUtil.getString(req, "imageUrl").trim();
+        String newImage = imageUrl.isEmpty() ? null : imageUrl;
 
         if (id == 0) {
             // Thêm mới
@@ -105,10 +103,8 @@ public class DrinkServlet extends HttpServlet {
             Drink existing = drinkDAO.findById(id);
             if (existing == null) { resp.sendRedirect(req.getContextPath() + "/admin/drinks"); return; }
 
-            if (newImage != null) {
-                // ảnh Base64 mới ghi đè trực tiếp, không cần xóa file cũ
-            } else {
-                newImage = existing.getImage(); // Giữ ảnh cũ
+            if (newImage == null || newImage.isEmpty()) {
+                newImage = existing.getImage(); // Giữ ảnh cũ nếu không nhập URL mới
             }
 
             existing.setCategoryId(categoryId);

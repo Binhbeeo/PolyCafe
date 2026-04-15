@@ -62,14 +62,15 @@
             </div>
 
             <div class="form-group">
-                <label>Hình ảnh</label>
-                <% if (isEdit) { %>
-                <div class="current-image">
-                    <img src="<%= FileUtil.getImageUrl(request, drink.getImage()) %>" alt="Ảnh hiện tại" style="height:80px;border-radius:8px">
-                    <small>Chọn ảnh mới để thay thế</small>
+                <label>Link hình ảnh (URL)</label>
+                <input type="text" name="imageUrl" class="form-control" 
+                       placeholder="Dán link ảnh từ ImgBB, Google... vào đây"
+                       value="<%= isEdit && drink.getImage() != null ? drink.getImage() : "" %>">
+                <% if (isEdit && drink.getImage() != null && !drink.getImage().isEmpty()) { %>
+                <div class="current-image" style="margin-top: 10px;">
+                    <img src="<%= FileUtil.getImageUrl(request, drink.getImage()) %>" alt="Ảnh hiện tại" style="height:80px;border-radius:8px;border: 1px solid #ddd;">
                 </div>
                 <% } %>
-                <input type="file" name="image" class="form-control" accept="image/*">
             </div>
 
             <div class="form-group">
