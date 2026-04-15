@@ -36,6 +36,8 @@ public class DrinkServlet extends HttpServlet {
                 if (drink == null) { resp.sendRedirect(req.getContextPath() + "/admin/drinks"); return; }
                 req.setAttribute("drink", drink);
                 req.setAttribute("categories", categoryDAO.findAllActive());
+                req.setAttribute("nextId", drinkDAO.findNextId(id));
+                req.setAttribute("prevId", drinkDAO.findPreviousId(id));
                 req.getRequestDispatcher("/views/admin/drink-form.jsp").forward(req, resp);
                 break;
             case "delete":
@@ -130,6 +132,6 @@ public class DrinkServlet extends HttpServlet {
             drinkDAO.update(existing);
         }
 
-        resp.sendRedirect(req.getContextPath() + "/admin/drinks?msg=saved");
+        resp.sendRedirect(req.getContextPath() + "/admin/drinks?action=edit&id=" + (id == 0 ? drinkDAO.findAll().get(drinkDAO.findAll().size()-1).getId() : id) + "&msg=saved");
     }
 }

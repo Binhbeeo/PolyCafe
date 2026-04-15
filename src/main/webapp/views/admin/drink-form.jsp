@@ -16,13 +16,33 @@
     List<Category> categories = (List<Category>) request.getAttribute("categories");
 %>
 
+<%
+    Integer nextId = (Integer) request.getAttribute("nextId");
+    Integer prevId = (Integer) request.getAttribute("prevId");
+    String msg = request.getParameter("msg");
+%>
+
 <div class="page-header">
     <h2><%= isEdit ? "✏️ Sửa đồ uống" : "➕ Thêm đồ uống" %></h2>
-    <a href="${pageContext.request.contextPath}/admin/drinks" class="btn btn-outline">← Quay lại</a>
+    <div class="page-header-actions">
+        <% if (isEdit) { %>
+            <% if (prevId != null) { %>
+                <a href="${pageContext.request.contextPath}/admin/drinks?action=edit&id=<%= prevId %>" class="btn btn-outline">⏮️ Trước</a>
+            <% } %>
+            <% if (nextId != null) { %>
+                <a href="${pageContext.request.contextPath}/admin/drinks?action=edit&id=<%= nextId %>" class="btn btn-outline">Kế tiếp ⏭️</a>
+            <% } %>
+        <% } %>
+        <a href="${pageContext.request.contextPath}/admin/drinks" class="btn btn-outline">← Danh sách</a>
+    </div>
 </div>
 
 <% if (request.getAttribute("error") != null) { %>
 <div class="alert alert-danger"><%= request.getAttribute("error") %></div>
+<% } %>
+
+<% if ("saved".equals(msg)) { %>
+<div class="alert alert-success">✅ Đã lưu thay đổi thành công!</div>
 <% } %>
 
 <div class="card" style="max-width:600px">

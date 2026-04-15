@@ -198,4 +198,38 @@ public class DrinkDAO {
         finally { JdbcUtil.close(rs, ps, con); }
         return false;
     }
+
+    public Integer findNextId(int currentId) {
+        String sql = "SELECT MIN(id) FROM drinks WHERE id > ?";
+        Connection con = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            con = JdbcUtil.getConnection();
+            ps  = con.prepareStatement(sql);
+            ps.setInt(1, currentId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                int nextId = rs.getInt(1);
+                return rs.wasNull() ? null : nextId;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        finally { JdbcUtil.close(rs, ps, con); }
+        return null;
+    }
+
+    public Integer findPreviousId(int currentId) {
+        String sql = "SELECT MAX(id) FROM drinks WHERE id < ?";
+        Connection con = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            con = JdbcUtil.getConnection();
+            ps  = con.prepareStatement(sql);
+            ps.setInt(1, currentId);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                int prevId = rs.getInt(1);
+                return rs.wasNull() ? null : prevId;
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        finally { JdbcUtil.close(rs, ps, con); }
+        return null;
+    }
 }
