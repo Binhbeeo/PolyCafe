@@ -10,9 +10,9 @@ import java.sql.SQLException;
 public class JdbcUtil {
 
     private static final String DRIVER = "com.microsoft.sqlserver.jdbc.SQLServerDriver";
-    private static final String URL    = "jdbc:sqlserver://localhost:1433;databaseName=PolyCoffeeDB;encrypt=false;trustServerCertificate=true";
-    private static final String USER   = "sa";
-    private static final String PASS   = "123"; // Đổi theo môi trường của bạn
+    private static final String URL    = "jdbc:sqlserver://polyphone-db-2026.database.windows.net;databaseName=PolyCoffeeDB;encrypt=false;trustServerCertificate=true";
+    private static final String USER   = "Binhbeo";
+    private static final String PASS   = "Beohub123@"; // Đổi theo môi trường của bạn
 
     static {
         try {
