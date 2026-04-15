@@ -3,14 +3,17 @@ package com.polycoffee.servlet;
 import com.polycoffee.dao.CategoryDAO;
 import com.polycoffee.dao.DrinkDAO;
 import com.polycoffee.entity.Drink;
+import com.polycoffee.util.FileUtil;
 import com.polycoffee.util.ParamUtil;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 import java.io.IOException;
 
 @WebServlet("/admin/drinks")
+@MultipartConfig(maxFileSize = 10 * 1024 * 1024) // 10MB
 public class DrinkServlet extends HttpServlet {
 
     private final DrinkDAO    drinkDAO    = new DrinkDAO();
@@ -38,7 +41,7 @@ public class DrinkServlet extends HttpServlet {
             case "delete":
                 Drink toDelete = drinkDAO.findById(id);
                 if (toDelete != null) {
-                    drinkDAO.delete(id); // ảnh Base64 lưu trong DB, xóa record là xong
+                    drinkDAO.delete(id);
                 }
                 resp.sendRedirect(req.getContextPath() + "/admin/drinks?msg=deleted");
                 break;
@@ -84,9 +87,20 @@ public class DrinkServlet extends HttpServlet {
             return;
         }
 
-        // Lấy URL ảnh từ input
-        String imageUrl = ParamUtil.getString(req, "imageUrl").trim();
-        String newImage = imageUrl.isEmpty() ? null : imageUrl;
+        // Xử lý ảnh: ưu tiên file upload, nếu không có thì lấy URL trực tiếp
+        String newImage = null;
+        
+        // Cách 1: Chọn file từ máy (tự động upload lên ImgBB)
+        String uploadedUrl = FileUtil.upload(req, "imageFile");
+        if (uploadedUrl != null) {
+            newImage = uploadedUrl;
+        } else {
+            // Cách 2: Nhập URL trực tiếp
+            String imageUrl = ParamUtil.getString(req, "imageUrl").trim();
+            if (!imageUrl.isEmpty()) {
+                newImage = imageUrl;
+            }
+        }
 
         if (id == 0) {
             // Thêm mới
@@ -103,8 +117,8 @@ public class DrinkServlet extends HttpServlet {
             Drink existing = drinkDAO.findById(id);
             if (existing == null) { resp.sendRedirect(req.getContextPath() + "/admin/drinks"); return; }
 
-            if (newImage == null || newImage.isEmpty()) {
-                newImage = existing.getImage(); // Giữ ảnh cũ nếu không nhập URL mới
+            if (newImage == null) {
+                newImage = existing.getImage(); // Giữ ảnh cũ nếu không upload hoặc nhập URL mới
             }
 
             existing.setCategoryId(categoryId);

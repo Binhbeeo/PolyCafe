@@ -62,13 +62,24 @@
             </div>
 
             <div class="form-group">
-                <label>Link hình ảnh (URL)</label>
-                <input type="text" name="imageUrl" class="form-control" 
-                       placeholder="Dán link ảnh từ ImgBB, Google... vào đây"
-                       value="<%= isEdit && drink.getImage() != null ? drink.getImage() : "" %>">
+                <label>Hình ảnh (Chọn từ máy hoặc nhập URL)</label>
+                
+                <div style="margin-bottom: 10px;">
+                    <small style="color: #666;">Cách 1: Chọn ảnh từ máy (Tự động tải lên ImgBB)</small>
+                    <input type="file" name="imageFile" class="form-control" accept="image/*">
+                </div>
+
+                <div>
+                    <small style="color: #666;">Cách 2: Hoặc dán Link ảnh (URL) trực tiếp</small>
+                    <input type="text" name="imageUrl" class="form-control" 
+                           placeholder="Dán link ảnh từ ImgBB, Google... vào đây"
+                           value="<%= isEdit && drink.getImage() != null ? drink.getImage() : "" %>">
+                </div>
+
                 <% if (isEdit && drink.getImage() != null && !drink.getImage().isEmpty()) { %>
                 <div class="current-image" style="margin-top: 10px;">
                     <img src="<%= FileUtil.getImageUrl(request, drink.getImage()) %>" alt="Ảnh hiện tại" style="height:80px;border-radius:8px;border: 1px solid #ddd;">
+                    <small style="display: block; color: #888;">Ảnh hiện tại</small>
                 </div>
                 <% } %>
             </div>
