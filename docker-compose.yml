@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  polycafe-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - polycafe-db
+    environment:
+      - DB_HOST=polycafe-db
+      - DB_NAME=PolyCoffeeDB
+      - DB_USER=SA
+      - DB_PASS=YourStrongPassword!
+    networks:
+      - polycafe-network
+
+  polycafe-db:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "YourStrongPassword!"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - polycafe-network
+
+networks:
+  polycafe-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
