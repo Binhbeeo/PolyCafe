@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*,java.text.*,com.polycoffee.entity.*" %>
+<%@ page import="java.util.*,java.text.*,com.polycoffee.entity.*,com.polycoffee.util.FileUtil" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
 <!DOCTYPE html>
@@ -75,11 +75,7 @@
             <% for (Drink d : drinks) { %>
             <div class="menu-card fade-in">
                 <div class="menu-card-img">
-                    <% if (d.getImage() != null && !d.getImage().isEmpty()) { %>
-                    <img src="<%= d.getImage() %>" alt="<%= d.getName() %>" loading="lazy">
-                    <% } else { %>
-                    <div class="menu-no-img"><i class="bi bi-cup"></i></div>
-                    <% } %>
+                    <img src="<%= FileUtil.getImageUrl(request, d.getImage()) %>" alt="<%= d.getName() %>" loading="lazy">
                 </div>
                 <div class="menu-card-body">
                     <div class="menu-category">

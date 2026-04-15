@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*,java.text.*,com.polycoffee.entity.*" %>
+<%@ page import="java.util.*,java.text.*,com.polycoffee.entity.*,com.polycoffee.util.FileUtil" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -83,11 +83,7 @@
             <a href="${pageContext.request.contextPath}/staff/bills?action=addDrink&billId=<%= bill.getId() %>&drinkId=<%= d.getId() %>"
                class="drink-item"
                onclick="return confirm('Thêm <%= d.getName() %> vào phiếu?')">
-                <% if (d.getImage() != null && !d.getImage().isEmpty()) { %>
-                <img src="<%= d.getImage() %>" alt="">
-                <% } else { %>
-                <div class="drink-no-img">☕</div>
-                <% } %>
+                <img src="<%= FileUtil.getImageUrl(request, d.getImage()) %>" alt="">
                 <div class="drink-name"><%= d.getName() %></div>
                 <div class="drink-price"><%= nf.format(d.getPrice()) %>đ</div>
             </a>

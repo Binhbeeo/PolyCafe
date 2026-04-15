@@ -5,18 +5,27 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URLEncoder;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * FileUtil - Tiện ích upload ảnh lưu dạng Base64 vào CSDL
- * Không lưu file vật lý, ảnh được encode thành data URI
- * và lưu thẳng vào cột image (NVARCHAR(MAX))
+ * FileUtil - Tiện ích upload ảnh lên ImgBB và lưu URL vào CSDL
  */
 public class FileUtil {
 
+    // API Key của ImgBB (Người dùng nên thay thế bằng key cá nhân nếu cần)
+    private static final String IMGBB_API_KEY = "677f59f9976375005953326164228490";
+    private static final String IMGBB_API_URL = "https://api.imgbb.com/1/upload";
+
     /**
-     * Đọc file ảnh từ request, trả về chuỗi Base64 data URI.
-     * Ví dụ: "data:image/jpeg;base64,/9j/4AAQSkZJRgAB..."
+     * Tải ảnh lên ImgBB và trả về URL trực tiếp của ảnh.
      * Trả về null nếu không có file hoặc lỗi.
      */
     public static String upload(HttpServletRequest request, String name) {
@@ -31,23 +40,14 @@ public class FileUtil {
             String ext = originalName.substring(originalName.lastIndexOf('.') + 1).toLowerCase();
             if (!ext.matches("jpg|jpeg|png|gif|webp")) return null;
 
-            // Xác định MIME type
-            String mimeType;
-            switch (ext) {
-                case "jpg": case "jpeg": mimeType = "image/jpeg"; break;
-                case "png":              mimeType = "image/png";  break;
-                case "gif":              mimeType = "image/gif";  break;
-                case "webp":             mimeType = "image/webp"; break;
-                default:                 mimeType = "image/jpeg";
-            }
-
-            // Đọc toàn bộ bytes của file rồi encode Base64
+            // Đọc toàn bộ bytes của file rồi encode Base64 để gửi lên ImgBB
             InputStream is = part.getInputStream();
             byte[] bytes = is.readAllBytes();
             is.close();
+            String base64Image = Base64.getEncoder().encodeToString(bytes);
 
-            String base64 = Base64.getEncoder().encodeToString(bytes);
-            return "data:" + mimeType + ";base64," + base64;
+            // Gửi request POST đến ImgBB API
+            return uploadToImgBB(base64Image);
 
         } catch (IOException | ServletException e) {
             e.printStackTrace();
@@ -56,21 +56,57 @@ public class FileUtil {
     }
 
     /**
-     * Không cần xóa file vật lý vì ảnh lưu trong DB.
-     * Giữ method để không phải sửa chỗ gọi cũ.
+     * Gọi API ImgBB để upload ảnh Base64
+     */
+    private static String uploadToImgBB(String base64Image) {
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            
+            // Body dạng x-www-form-urlencoded
+            String form = "key=" + IMGBB_API_KEY + "&image=" + URLEncoder.encode(base64Image, StandardCharsets.UTF_8);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(IMGBB_API_URL))
+                    .header("Content-Type", "application/x-www-form-urlencoded")
+                    .POST(HttpRequest.BodyPublishers.ofString(form))
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                // Parse JSON thủ công để lấy URL (để tránh thêm dependency JSON)
+                String body = response.body();
+                Pattern pattern = Pattern.compile("\"url\":\"(.*?)\"");
+                Matcher matcher = pattern.matcher(body);
+                if (matcher.find()) {
+                    // Trả về URL và thay thế các dấu gạch chéo ngược (nếu có)
+                    return matcher.group(1).replace("\\/", "/");
+                }
+            } else {
+                System.err.println("ImgBB Upload Error: " + response.body());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Không cần xóa file vật lý vì ảnh lưu trên cloud ImgBB.
      */
     public static void delete(HttpServletRequest request, String imageData) {
-        // Base64 lưu trong DB, không có file vật lý để xóa
+        // ImgBB free API không hỗ trợ xóa qua API đơn giản mà không có delete_url
     }
 
     /**
      * Trả về src để hiển thị ảnh.
-     * Nếu imageData là Base64 data URI → trả về luôn.
+     * Nếu imageData là URL hoặc Base64 → trả về luôn.
      * Nếu null/rỗng → trả về ảnh placeholder.
      */
     public static String getImageUrl(HttpServletRequest request, String imageData) {
         if (imageData == null || imageData.isEmpty()) {
-            return request.getContextPath() + "/assets/images/no-image.png";
+            // Placeholder image
+            return "https://via.placeholder.com/150?text=No+Image";
         }
         return imageData;
     }

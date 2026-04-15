@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*,com.polycoffee.entity.*" %>
+<%@ page import="java.util.*,com.polycoffee.entity.*,com.polycoffee.util.FileUtil" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -63,9 +63,9 @@
 
             <div class="form-group">
                 <label>Hình ảnh</label>
-                <% if (isEdit && drink.getImage() != null && !drink.getImage().isEmpty()) { %>
+                <% if (isEdit) { %>
                 <div class="current-image">
-                    <img src="<%= drink.getImage() %>" alt="Ảnh hiện tại" style="height:80px;border-radius:8px">
+                    <img src="<%= FileUtil.getImageUrl(request, drink.getImage()) %>" alt="Ảnh hiện tại" style="height:80px;border-radius:8px">
                     <small>Chọn ảnh mới để thay thế</small>
                 </div>
                 <% } %>

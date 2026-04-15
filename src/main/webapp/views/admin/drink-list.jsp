@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*,java.text.*,com.polycoffee.entity.*" %>
+<%@ page import="java.util.*,java.text.*,com.polycoffee.entity.*,com.polycoffee.util.FileUtil" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -50,11 +50,7 @@
         <tr data-name="<%= d.getName().toLowerCase() %>"
             data-category="<%= d.getCategoryId() %>">
             <td>
-                <% if (d.getImage() != null && !d.getImage().isEmpty()) { %>
-                <img src="<%= d.getImage() %>" class="thumb" alt="">
-                <% } else { %>
-                <span class="no-img">N/A</span>
-                <% } %>
+                <img src="<%= FileUtil.getImageUrl(request, d.getImage()) %>" class="thumb" alt="">
             </td>
             <td><%= d.getName() %></td>
             <td><%= d.getCategoryName() != null ? d.getCategoryName() : "" %></td>
