@@ -120,9 +120,14 @@ public class UserServlet extends HttpServlet {
         } else {
             User u = dao.findById(id);
             if (u == null) { resp.sendRedirect(req.getContextPath() + "/admin/users"); return; }
-            u.setFullName(fullName); u.setPhone(phone);
+            u.setEmail(email); u.setFullName(fullName); u.setPhone(phone);
             u.setRole(role.isEmpty() ? u.getRole() : role); u.setActive(active);
-            dao.update(u);
+            if (!dao.update(u)) {
+                req.setAttribute("error", "Email đã tồn tại trong hệ thống.");
+                req.setAttribute("editUser", u);
+                req.getRequestDispatcher("/views/admin/user-form.jsp").forward(req, resp);
+                return;
+            }
         }
         resp.sendRedirect(req.getContextPath() + "/admin/users?msg=saved");
     }

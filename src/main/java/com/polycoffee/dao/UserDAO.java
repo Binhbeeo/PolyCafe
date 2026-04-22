@@ -103,16 +103,19 @@ public class UserDAO {
     }
 
     public boolean update(User user) {
-        String sql = "UPDATE users SET full_name=?, phone=?, role=?, active=? WHERE id=?";
+        // Check email unique
+        if (existsByEmail(user.getEmail(), user.getId())) return false;
+        String sql = "UPDATE users SET email=?, full_name=?, phone=?, role=?, active=? WHERE id=?";
         Connection con = null; PreparedStatement ps = null;
         try {
             con = JdbcUtil.getConnection();
             ps  = con.prepareStatement(sql);
-            ps.setString(1, user.getFullName());
-            ps.setString(2, user.getPhone());
-            ps.setString(3, user.getRole());
-            ps.setBoolean(4, user.isActive());
-            ps.setInt(5, user.getId());
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getFullName());
+            ps.setString(3, user.getPhone());
+            ps.setString(4, user.getRole());
+            ps.setBoolean(5, user.isActive());
+            ps.setInt(6, user.getId());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) { e.printStackTrace(); return false; }
         finally { JdbcUtil.close(ps, con); }
@@ -163,6 +166,22 @@ public class UserDAO {
             con = JdbcUtil.getConnection();
             ps  = con.prepareStatement(sql);
             ps.setString(1, phone.trim());
+            ps.setInt(2, excludeId);
+            rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt(1) > 0;
+        } catch (SQLException e) { e.printStackTrace(); }
+        finally { JdbcUtil.close(rs, ps, con); }
+        return false;
+    }
+
+    public boolean existsByEmail(String email, int excludeId) {
+        if (email == null || email.trim().isEmpty()) return false;
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ? AND id != ?";
+        Connection con = null; PreparedStatement ps = null; ResultSet rs = null;
+        try {
+            con = JdbcUtil.getConnection();
+            ps  = con.prepareStatement(sql);
+            ps.setString(1, email.trim());
             ps.setInt(2, excludeId);
             rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1) > 0;

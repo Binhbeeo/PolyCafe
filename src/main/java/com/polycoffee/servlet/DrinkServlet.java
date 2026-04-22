@@ -43,7 +43,11 @@ public class DrinkServlet extends HttpServlet {
             case "delete":
                 Drink toDelete = drinkDAO.findById(id);
                 if (toDelete != null) {
-                    drinkDAO.delete(id);
+                    int result = drinkDAO.delete(id);
+                    if (result == -1) {
+                        resp.sendRedirect(req.getContextPath() + "/admin/drinks?msg=err_sold");
+                        return;
+                    }
                 }
                 resp.sendRedirect(req.getContextPath() + "/admin/drinks?msg=deleted");
                 break;
@@ -81,7 +85,7 @@ public class DrinkServlet extends HttpServlet {
             req.getRequestDispatcher("/views/admin/drink-form.jsp").forward(req, resp);
             return;
         }
-        if (drinkDAO.existsByName(name, id)) {
+        if (drinkDAO.existsByName(name, categoryId, id)) {
             req.setAttribute("error", "Tên đồ uống đã tồn tại.");
             req.setAttribute("categories", categoryDAO.findAllActive());
             if (id > 0) req.setAttribute("drink", drinkDAO.findById(id));

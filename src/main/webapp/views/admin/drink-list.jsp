@@ -34,6 +34,8 @@
 <div class="alert alert-success">Lưu thành công!</div>
 <% } else if ("deleted".equals(request.getParameter("msg"))) { %>
 <div class="alert alert-warning">Đã xóa đồ uống.</div>
+<% } else if ("err_sold".equals(request.getParameter("msg"))) { %>
+<div class="alert alert-danger">Không thể xóa đồ uống đã từng được bán.</div>
 <% } %>
 
 <div class="card">

@@ -53,12 +53,18 @@ public class BillServlet extends HttpServlet {
 
             // Chuyển trạng thái
             case "finish":
-                billDAO.updateStatus(id, "finish", isAdmin);
-                resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?msg=finished");
+                if (billDAO.updateStatus(id, "finish", isAdmin)) {
+                    resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?msg=finished");
+                } else {
+                    resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?msg=err_status");
+                }
                 break;
             case "cancel":
-                billDAO.updateStatus(id, "cancel", isAdmin);
-                resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?msg=cancelled");
+                if (billDAO.updateStatus(id, "cancel", isAdmin)) {
+                    resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?msg=cancelled");
+                } else {
+                    resp.sendRedirect(req.getContextPath() + (isAdmin ? "/admin/bills" : "/staff/bills") + "?msg=err_status");
+                }
                 break;
 
             // Danh sách hóa đơn

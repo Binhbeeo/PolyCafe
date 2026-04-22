@@ -184,14 +184,15 @@ public class DrinkDAO {
         try { d.setCategoryName(rs.getString("category_name")); } catch (SQLException ignored) {}
         return d;
     }
-    public boolean existsByName(String name, int excludeId) {
-        String sql = "SELECT COUNT(*) FROM drinks WHERE LOWER(name) = LOWER(?) AND id != ?";
+    public boolean existsByName(String name, int categoryId, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM drinks WHERE LOWER(name) = LOWER(?) AND category_id = ? AND id != ?";
         Connection con = null; PreparedStatement ps = null; ResultSet rs = null;
         try {
             con = JdbcUtil.getConnection();
             ps  = con.prepareStatement(sql);
             ps.setString(1, name);
-            ps.setInt(2, excludeId);
+            ps.setInt(2, categoryId);
+            ps.setInt(3, excludeId);
             rs = ps.executeQuery();
             if (rs.next()) return rs.getInt(1) > 0;
         } catch (SQLException e) { e.printStackTrace(); }

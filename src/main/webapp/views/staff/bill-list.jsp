@@ -21,6 +21,8 @@
 <div class="alert alert-success">Đã chuyển sang thanh toán!</div>
 <% } else if ("cancelled".equals(request.getParameter("msg"))) { %>
 <div class="alert alert-warning">Đã hủy hóa đơn.</div>
+<% } else if ("err_status".equals(request.getParameter("msg"))) { %>
+<div class="alert alert-danger">Thao tác không hợp lệ hoặc bạn không có quyền thực hiện.</div>
 <% } %>
 
 <div class="card">
